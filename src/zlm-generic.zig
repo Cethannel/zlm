@@ -482,6 +482,34 @@ pub fn SpecializeOn(comptime Real: type) type {
                     [3]Real{ 0, 0, 1 },
                 },
             };
+
+            const Self = @This();
+
+            pub fn format(value: Self, comptime _: []const u8, _: std.fmt.FormatOptions, stream: anytype) !void {
+                try stream.writeAll("mat3{");
+
+                inline for (0..3) |i| {
+                    const row = value.fields[i];
+                    try stream.print(" ({d:.2} {d:.2} {d:.2})", .{ row[0], row[1], row[2] });
+                }
+
+                try stream.writeAll(" }");
+            }
+
+            /// performs matrix multiplication of a*b
+            pub fn mul(a: Self, b: Self) Self {
+                var result: Self = undefined;
+                inline for (0..3) |row| {
+                    inline for (0..3) |col| {
+                        var sum: Real = 0.0;
+                        inline for (0..3) |i| {
+                            sum += a.fields[row][i] * b.fields[i][col];
+                        }
+                        result.fields[row][col] = sum;
+                    }
+                }
+                return result;
+            }
         };
 
         /// 4 by 4 matrix type.
