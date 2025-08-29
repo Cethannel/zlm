@@ -280,8 +280,11 @@ pub fn SpecializeOn(comptime Real: type) type {
                 };
             }
 
-            pub fn format(value: Self, comptime _: []const u8, _: std.fmt.FormatOptions, stream: anytype) !void {
-                try stream.print("vec2({d:.2}, {d:.2})", .{ value.x, value.y });
+            pub fn format(
+                value: Self,
+                writer: *std.Io.Writer,
+            ) std.Io.Writer.Error!void {
+                try writer.print("vec2({d:.2}, {d:.2})", .{ value.x, value.y });
             }
 
             fn getField(vec: Self, comptime index: comptime_int) Real {
@@ -368,8 +371,11 @@ pub fn SpecializeOn(comptime Real: type) type {
                 };
             }
 
-            pub fn format(value: Self, comptime _: []const u8, _: std.fmt.FormatOptions, stream: anytype) !void {
-                try stream.print("vec3({d:.2}, {d:.2}, {d:.2})", .{ value.x, value.y, value.z });
+            pub fn format(
+                value: Self,
+                writer: *std.Io.Writer,
+            ) std.Io.Writer.Error!void {
+                try writer.print("vec3({d:.2}, {d:.2}, {d:.2})", .{ value.x, value.y, value.z });
             }
 
             /// calculates the cross product. result will be perpendicular to a and b.
@@ -499,8 +505,11 @@ pub fn SpecializeOn(comptime Real: type) type {
                 };
             }
 
-            pub fn format(value: Self, comptime _: []const u8, _: std.fmt.FormatOptions, stream: anytype) !void {
-                try stream.print("vec4({d:.2}, {d:.2}, {d:.2}, {d:.2})", .{ value.x, value.y, value.z, value.w });
+            pub fn format(
+                value: Self,
+                writer: *std.Io.Writer,
+            ) std.Io.Writer.Error!void {
+                try writer.print("vec4({d:.2}, {d:.2}, {d:.2}, {d:.2})", .{ value.x, value.y, value.z, value.w });
             }
 
             /// multiplies the vector with a matrix.
@@ -554,15 +563,18 @@ pub fn SpecializeOn(comptime Real: type) type {
 
             const Self = @This();
 
-            pub fn format(value: Self, comptime _: []const u8, _: std.fmt.FormatOptions, stream: anytype) !void {
-                try stream.writeAll("mat3{");
+            pub fn format(
+                value: Self,
+                writer: *std.Io.Writer,
+            ) std.Io.Writer.Error!void {
+                try writer.writeAll("mat3{");
 
                 inline for (0..3) |i| {
                     const row = value.fields[i];
-                    try stream.print(" ({d:.2} {d:.2} {d:.2})", .{ row[0], row[1], row[2] });
+                    try writer.print(" ({d:.2} {d:.2} {d:.2})", .{ row[0], row[1], row[2] });
                 }
 
-                try stream.writeAll(" }");
+                try writer.writeAll(" }");
             }
 
             /// performs matrix multiplication of a*b
@@ -606,15 +618,18 @@ pub fn SpecializeOn(comptime Real: type) type {
                 },
             };
 
-            pub fn format(value: Self, comptime _: []const u8, _: std.fmt.FormatOptions, stream: anytype) !void {
-                try stream.writeAll("mat4{");
+            pub fn format(
+                value: Self,
+                writer: *std.Io.Writer,
+            ) std.Io.Writer.Error!void {
+                try writer.writeAll("mat4{");
 
                 inline for (0..4) |i| {
                     const row = value.fields[i];
-                    try stream.print(" ({d:.2} {d:.2} {d:.2} {d:.2})", .{ row[0], row[1], row[2], row[3] });
+                    try writer.print(" ({d:.2} {d:.2} {d:.2} {d:.2})", .{ row[0], row[1], row[2], row[3] });
                 }
 
-                try stream.writeAll(" }");
+                try writer.writeAll(" }");
             }
 
             /// performs matrix multiplication of a*b
